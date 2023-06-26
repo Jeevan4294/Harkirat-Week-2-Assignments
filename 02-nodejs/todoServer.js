@@ -44,6 +44,57 @@ const bodyParser = require('body-parser');
 
 const app = express();
 
-app.use(bodyParser.json());
+app.use(express.json());
 
+var todoList = [];
+
+  app.post("/todos", (req, res) =>  {
+    console.log(req.body)
+    var todo = req.body;
+    todo.id = todoList.length;
+    todoList.push(todo);
+    res.status(201).json(todo);
+  });
+
+  app.delete("/todos/:id", (req, res) => {
+    const indexOfTodo = req.params.id;
+    var beforeSlice = todoList.slice(0,indexOfTodo)
+    var afterSlice = todoList.slice(indexOfTodo+1)
+    todoList = beforeSlice.concat(afterSlice);
+    res.status(200);
+  })
+
+  app.put("/todos/:id", (req, res) => {
+    const index = req.params.id;
+    if(index >= todoList.length){
+      res.status(404).send("Resource Not Found !")
+    }
+    var updatedTodo = req.body;
+    updatedTodo.id = index;
+    todoList[index] = updatedTodo;
+    res.status(200).json(updatedTodo);
+  })
+
+  app.get ("/todos", (req, res) => {
+    res.status(todoList);
+  });
+
+  app.get("/todos/:id", (req, res) => {
+    const indexOfTodo = req.params.id;
+    if(indexOfTodo >= todoList.length){
+      res.status(404).send("Resource Not Found !")
+    }
+    res.send(todoList[indexOfTodo]);
+  })
+
+  app.get ("/todos/clear", (req,res) => {
+    todoList = [];
+    res.status(200).send("Done");
+  })
+
+
+  app.all('*', (req, res) => {
+    res.status(404).send('Route not found');
+  });
+  
 module.exports = app;
