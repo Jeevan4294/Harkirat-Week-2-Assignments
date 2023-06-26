@@ -34,4 +34,59 @@ const PORT = 3000;
 const app = express();
 // write your logic here, DONT WRITE app.listen(3000) when you're running tests, the tests will automatically start the server
 
+var users = [];
+
+app.use(express.json());
+
+app.get('/data', (req, res) => {
+  const email = req.headers.email;
+  const password = req.headers.password;
+  for( var i = 0; i < users.length ; i++){
+    var user = users[i];
+    if(user.email === email && user.password === password) {
+      return res.status(201).json(
+        {email: users[i].email,
+          firstName: users[i].firstName,
+          lastName:users[i].lastName
+        });
+    }
+  }
+  res.status(401).send("unauthorised...!");
+});
+
+app.post('/signup', (req, res) => {
+  var user = req.body;
+  for( var i = 0; i < users.length ; i++){
+    if(users[i].email === user.email){
+      return res.status(400).send('Email already exists...!');
+    }
+  }
+  users.push(user);
+  res.status(201).send('Signup successful...!');
+});
+
+app.post('/login', (req, res) => {
+  const email = req.body.email;
+  const password = req.body.password;
+  for( var i = 0; i < users.length ; i++){
+    var user = users[i];
+    if(user.email === email && user.password === password) {
+      return res.status(201).json(
+        {email: users[i].email,
+          firstName: users[i].firstName,
+          lastName:users[i].lastName
+        });
+    }
+  }
+  res.status(401).send("unauthorised...!");
+});
+
+app.all('*', (req, res) => {
+  res.status(404);
+});
+
+app.listen(3000, () => {
+  console.log('Server is listening on port 3000');
+});
+
 module.exports = app;
