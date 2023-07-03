@@ -41,12 +41,19 @@
  */
 const express = require('express');
 const bodyParser = require('body-parser');
+const path = require('path');
+const cors = require('cors');
+
+
 
 const app = express();
 
-app.use(express.json());
+app.use(express.json(),
+  cors({
+    origin: '*'
+  }));
 
-var todoList = [];
+let todoList = [];
 
   app.post("/todos", (req, res) =>  {
     console.log(req.body)
@@ -76,7 +83,7 @@ var todoList = [];
   })
 
   app.get ("/todos", (req, res) => {
-    res.status(todoList);
+    res.send(todoList);
   });
 
   app.get("/todos/:id", (req, res) => {
@@ -92,9 +99,16 @@ var todoList = [];
     res.status(200).send("Done");
   })
 
+  app.get ("/", (req,res) => {
+    todoList = [];
+    res.status(200).sendFile(path.join(__dirname, "/index.html"));
+  })
 
   app.all('*', (req, res) => {
     res.status(404).send('Route not found');
   });
-  
+
+  app.listen(3000, () => {
+    console.log('Server is listening on port 3000');
+  });  
 module.exports = app;
